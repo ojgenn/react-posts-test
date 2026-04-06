@@ -162,7 +162,7 @@ export class ApiClient {
   }
 }
 
-/** Синглтон с базой из `VITE_API_BASE_URL` */
+/** Синглтон: базовый URL из `.env` → `VITE_API_BASE_URL` (см. Vite env) */
 export const api = new ApiClient({
   baseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
 })

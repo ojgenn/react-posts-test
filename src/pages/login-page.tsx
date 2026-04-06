@@ -1,7 +1,13 @@
 import { useId, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { useForm, useWatch } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { Check, Eye, EyeOff, Lock, User, X } from 'lucide-react'
+import { ApiError } from '../api/api-client'
+import { loginWithPassword } from '../api/auth-api'
+import { persistAuthTokens } from '../auth/token-storage'
 import { Form } from '../components/form'
 import {
   loginSchema,
@@ -32,6 +38,7 @@ const inputErr =
 export function LoginPage() {
   const loginId = useId()
   const passwordId = useId()
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
 
   const {
@@ -45,7 +52,7 @@ export function LoginPage() {
     mode: 'onBlur',
     reValidateMode: 'onChange',
     defaultValues: {
-      login: 'test',
+      login: '',
       password: '',
       remember: false,
     },
@@ -53,8 +60,29 @@ export function LoginPage() {
 
   const loginValue = useWatch({ control, name: 'login' }) ?? ''
 
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginFormValues) => {
+      const res = await loginWithPassword({
+        username: data.login.trim(),
+        password: data.password,
+        expiresInMins: 30,
+      })
+      persistAuthTokens(res.accessToken, res.refreshToken, data.remember)
+      return res
+    },
+    onSuccess: () => {
+      toast.success('Вход выполнен')
+      navigate('/products')
+    },
+    onError: (err) => {
+      const msg =
+        err instanceof ApiError ? err.message : 'Не удалось выполнить вход'
+      toast.error(msg)
+    },
+  })
+
   const onValid = (data: LoginFormValues) => {
-    void data
+    loginMutation.mutate(data)
   }
 
   return (
@@ -186,9 +214,11 @@ export function LoginPage() {
 
           <button
             type="submit"
-            className="mt-2 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={loginMutation.isPending}
+            aria-busy={loginMutation.isPending}
+            className="mt-2 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-60"
           >
-            Войти
+            {loginMutation.isPending ? 'Вход…' : 'Войти'}
           </button>
         </Form>
 
