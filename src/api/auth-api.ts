@@ -1,6 +1,5 @@
 import { api } from './api-client'
 
-/** Ответ POST /auth/login — [DummyJSON Auth](https://dummyjson.com/docs/auth) */
 export interface DummyJsonLoginResponse {
   id: number
   username: string
@@ -16,7 +15,6 @@ export interface DummyJsonLoginResponse {
 export interface LoginRequestBody {
   username: string
   password: string
-  /** Минуты жизни access token; по умолчанию на стороне API 60 */
   expiresInMins?: number
 }
 

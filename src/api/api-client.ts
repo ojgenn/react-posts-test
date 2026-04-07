@@ -1,8 +1,3 @@
-/**
- * HTTP-клиент на fetch: базовый URL, JWT в Authorization, JSON по умолчанию.
- * Токен: `setAuthToken` / `getAuthToken` или `getToken` в конфиге (например, из zustand).
- */
-
 export class ApiError extends Error {
   readonly status: number
   readonly body: unknown
@@ -17,14 +12,11 @@ export class ApiError extends Error {
 
 export interface ApiClientConfig {
   baseUrl?: string
-  /** Если задан, вызывается на каждый запрос (удобно связать с zustand). Иначе — модульный токен из setAuthToken. */
   getToken?: () => string | null | undefined
-  /** Например, редирект на логин при 401 */
   onUnauthorized?: () => void
 }
 
 export type ApiRequestOptions = RequestInit & {
-  /** Если задан, сериализуется в JSON и подменяет `body`; выставляется Content-Type: application/json */
   json?: unknown
 }
 
@@ -162,7 +154,6 @@ export class ApiClient {
   }
 }
 
-/** Синглтон: базовый URL из `.env` → `VITE_API_BASE_URL` (см. Vite env) */
 export const api = new ApiClient({
   baseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
 })
