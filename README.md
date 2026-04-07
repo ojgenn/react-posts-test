@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+Админ-интерфейс: авторизация и каталог товаров с таблицей, поиском и сортировкой. Данные — [DummyJSON](https://dummyjson.com/docs).
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Стек
 
-Currently, two official plugins are available:
+| Область        | Технологии                                      |
+| -------------- | ----------------------------------------------- |
+| UI             | React 19, TypeScript, Tailwind CSS, Vite        |
+| Данные и кэш   | TanStack Query                                  |
+| Формы          | React Hook Form, Zod                            |
+| Состояние UI   | Zustand (persist для сортировки таблицы)        |
+| Маршрутизация  | React Router                                    |
+| Уведомления    | Sonner                                          |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Быстрый старт
 
-## React Compiler
+1. Скопируйте переменные окружения:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+   ```bash
+   cp .env.example .env
+   ```
 
-## Expanding the ESLint configuration
+2. Установите зависимости и запустите dev-сервер:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+3. Сборка и превью production:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+   ```bash
+   npm run build
+   npm run preview
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## API
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+| Назначение   | Документация |
+| ------------ | ------------ |
+| Товары       | [DummyJSON — Products](https://dummyjson.com/docs/products) |
+| Авторизация  | [DummyJSON — Auth](https://dummyjson.com/docs/auth) |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Базовый URL задаётся в `.env`: `VITE_API_BASE_URL` (по умолчанию `https://dummyjson.com`).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Функциональные требования (ТЗ)
+
+### Форма входа
+
+- Валидация полей (обязательность заполнения).
+- Ошибки API: уведомление (toast) и/или текст ошибки у полей.
+- Ссылка «Создать» не ведёт никуда (заглушка).
+- **Запомнить данные**
+  - чекбокс включён — токены в `localStorage`, сессия после закрытия браузера;
+  - выключен — `sessionStorage`, сессия сбрасывается при закрытии вкладки.
+
+### Список товаров
+
+- Столбцы по макету Figma.
+- Индикатор загрузки при подгрузке данных.
+- Данные с API.
+- Сортировка по столбцам (например, цена, рейтинг); состояние сортировки сохраняется.
+
+### Добавление товара
+
+- Кнопка «Добавить» открывает форму: наименование, цена, вендор, артикул (дизайн на усмотрение).
+- Успех — toast; **сохранение на бэкенд не реализуется** (по ТЗ).
+
+### Интерфейс таблицы
+
+- Рейтинг **ниже 3.5** — подсветка красным.
+- Иконка с тремя точками в круге — заглушка.
+- Обновление таблицы (refresh).
+- Сортировка по возрастанию / убыванию; индикаторы и оформление — на усмотрение.
+
+### Поиск
+
+- Поиск товаров через **API**.
