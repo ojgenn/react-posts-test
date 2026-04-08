@@ -1,14 +1,15 @@
 import { useId, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Check, Eye, EyeOff, Lock, User, X } from 'lucide-react'
+import { Check, Eye, EyeOff, Lock } from 'lucide-react'
 import { ApiError } from '../api/api-client'
 import { loginWithPassword } from '../api/auth-api'
 import { persistAuthTokens } from '../auth/token-storage'
 import { Form } from '../components/form'
+import { LoginUsernameField } from '../components/login-username-field'
 import {
   loginSchema,
   type LoginFormValues,
@@ -58,8 +59,6 @@ export function LoginPage() {
     },
   })
 
-  const loginValue = useWatch({ control, name: 'login' }) ?? ''
-
   const loginMutation = useMutation({
     mutationFn: async (data: LoginFormValues) => {
       const res = await loginWithPassword({
@@ -97,55 +96,13 @@ export function LoginPage() {
         </p>
 
         <Form className="space-y-5" onSubmit={handleSubmit(onValid)}>
-          <div>
-            <label
-              htmlFor={loginId}
-              className="mb-1 block text-xs font-semibold text-gray-500"
-            >
-              Логин
-            </label>
-            <div className="relative flex items-center">
-              <User
-                className="pointer-events-none absolute left-3 size-5 text-gray-400"
-                strokeWidth={1.75}
-                aria-hidden
-              />
-              <input
-                id={loginId}
-                type="text"
-                autoComplete="username"
-                aria-invalid={!!errors.login}
-                aria-describedby={errors.login ? `${loginId}-error` : undefined}
-                className={`${inputBase} ${errors.login ? inputErr : inputOk}`}
-                {...register('login')}
-              />
-              {loginValue.length > 0 && (
-                <button
-                  type="button"
-                  className="absolute right-2 rounded p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-                  onClick={() =>
-                    setValue('login', '', {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    })
-                  }
-                  aria-label="Очистить поле логина"
-                >
-                  <X className="size-4" strokeWidth={2} />
-                </button>
-              )}
-            </div>
-            {errors.login && (
-              <p
-                id={`${loginId}-error`}
-                className="mt-1 text-xs text-red-600"
-                role="alert"
-              >
-                {errors.login.message}
-              </p>
-            )}
-          </div>
+          <LoginUsernameField
+            loginId={loginId}
+            control={control}
+            setValue={setValue}
+            loginRegistration={register('login')}
+            error={errors.login}
+          />
 
           <div>
             <label
